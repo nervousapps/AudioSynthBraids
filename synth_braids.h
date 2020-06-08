@@ -2,7 +2,6 @@
 #define SYNTH_BRAIDS_H_
 
 #include "AudioStream.h"
-#include "utility/dspinst.h"
 #include "macro_oscillator.h"
 
 
@@ -11,7 +10,7 @@ using namespace braids;
 class AudioSynthBraids: public AudioStream
 {
 public:
-        AudioSynthBraids(): AudioStream(1, inputQueueArray), kSampleRate(AUDIO_SAMPLE_RATE_EXACT), kAudioBlockSize(AUDIO_BLOCK_SAMPLES), magnitude(65536.0) { }
+        AudioSynthBraids(): AudioStream(0, NULL), kSampleRate(AUDIO_SAMPLE_RATE_EXACT), kAudioBlockSize(AUDIO_BLOCK_SAMPLES), magnitude(65536.0) { }
         ~AudioSynthBraids() { }
 
         void set_braids_shape(int16_t shape) {
@@ -45,7 +44,7 @@ public:
 
         inline void init_braids(){
             // Global used to trigger the next buffer to render
-            wait = 0;
+            // wait = 0;
 
             // Initializes the objects
             osc.Init();
@@ -58,8 +57,6 @@ public:
         virtual void update(void);
 
 private:
-        audio_block_t *inputQueueArray[1];
-
         MacroOscillator osc;
 
         const uint32_t kSampleRate;
@@ -71,9 +68,11 @@ private:
         volatile int16_t color;
         volatile int16_t shapebraids;
 
-        int32_t magnitude;
+      	int16_t buffer[AUDIO_BLOCK_SAMPLES] = { 0 };
 
-        volatile uint8_t wait;
+        volatile int32_t magnitude;
+
+        // volatile uint8_t wait;
 
 };
 

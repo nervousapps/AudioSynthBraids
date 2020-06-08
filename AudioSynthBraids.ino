@@ -6,7 +6,6 @@
 #include <TeensyThreads.h>
 
 #include "synth_braids.h"
-#include "AudioSampleSnare.h"
 
 #include <Audio.h>
 
@@ -20,13 +19,14 @@ AudioConnection          patchCord1(synthBraids, 0, mix1, 1);
 AudioConnection          patchCord2(mix1, 0, dacs1, 0);
 
 // define the pins you want to use and the CC ID numbers on which to send them..
-volatile const int ANALOG_PINS[3] = {A0,A1,A2};
+volatile const int ANALOG_PINS[4] = {A0,A1,A2,A3};
 
 // initialize the ReponsiveAnalogRead objects
 ResponsiveAnalogRead analog[]{
   {ANALOG_PINS[0],true},
   {ANALOG_PINS[1],true},
-  {ANALOG_PINS[2],true}
+  {ANALOG_PINS[2],true},
+  {ANALOG_PINS[3],true}
 };
 
 // initialize required values
@@ -38,7 +38,7 @@ elapsedMillis msec = 0;
 int th1;
 
 // initiaize the sequencer
-volatile int SEQUENCER_NOTES[8] = {60,80,40,60,80,60,72,60};
+volatile int SEQUENCER_NOTES[8] = {30,40,20,30,40,30,36,30};
 volatile int lastnote = 0;
 
 // thread to get parameters from the analog pins
@@ -69,9 +69,9 @@ void get_parameters(){
 
 // sequencer
 void noteSeq(){
-  if(msec>=250 && msec<=260){
-    playmem.play(AudioSampleSnare);
-  }
+  // if(msec>=250 && msec<=260){
+  //   playmem.play(AudioSampleSnare);
+  // }
   if(msec>=500){
     synthBraids.set_braids_pitch(SEQUENCER_NOTES[lastnote] << 7);
     lastnote = lastnote + 1;
@@ -80,6 +80,15 @@ void noteSeq(){
     }
     msec = 0;
   }
+  // if(msec>=10){
+  //   analog[3].update();
+  //   if (analog[3].hasChanged()) {
+  //     Serial.print((analog[3].getValue()>>2)<<7);
+  //     Serial.print("\n");
+  //     synthBraids.set_braids_pitch((analog[3].getValue()>>2)<<7);
+  //   }
+  //   msec = 0;
+  // }
 }
 
 //************SETUP**************
@@ -97,7 +106,7 @@ void setup() {
 
   // Configure the DACs
   dacs1.analogReference(INTERNAL);
-  AudioMemory(80);
+  AudioMemory(100);
   mix1.gain(0,5);
   mix1.gain(1,5);
 
